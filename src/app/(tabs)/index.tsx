@@ -1,20 +1,35 @@
-import { Alert, StyleSheet } from "react-native";
-
-import EditScreenInfo from "@/src/components/EditScreenInfo";
+import { Alert, StyleSheet, ActivityIndicator, Button } from "react-native";
 import { Text, View } from "@/src/components/Themed";
 import MapView, { Marker, LatLng, PROVIDER_GOOGLE } from "react-native-maps";
-import React, { useEffect, useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import React, {
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+} from "react";
 import * as Location from "expo-location";
 import { MarkerInterface } from "@/src/types";
-import MapEvent from "react-native-maps";
+import BottomSheet, {
+   BottomSheetFlatList,
+   BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import { useNavigation } from "expo-router";
+import { MapType } from "@/src/context/MapContext";
 
 export default function TabOneScreen() {
+   const navigation = useNavigation();
    const [currentLocation, setCurrentLocation] = useState<LatLng>({
       latitude: 0,
       longitude: 0,
    });
-   const [markerState, setMarkerState] = useState({} as any);
-   const [markers, setMarkers] = useState<MarkerInterface[]>([]);
+
+   const { markers, setMarkers } = useContext(MapType);
+   // const [markers, setMarkers] = useState<MarkerInterface[]>([]);
+
+   const snapPoints = useMemo(() => [75, "50%", "90%"], []);
 
    const getCurrentLocation = async () => {
       try {
@@ -37,6 +52,8 @@ export default function TabOneScreen() {
          key: String(markers.length), // Assign a unique key to the marker
       };
       setMarkers([...markers, newMarker]);
+
+      navigation.navigate("modal", { test: "LOLOLO" });
    };
 
    const handleMarkerDrag = (index: number, coordinate: LatLng) => {
@@ -57,31 +74,46 @@ export default function TabOneScreen() {
    }, []);
 
    return (
-      <View style={{ flex: 1 }}>
-         {currentLocation ? (
-            <MapView
-               // provider={PROVIDER_GOOGLE}
-               style={{ flex: 1 }}
-               initialRegion={{
-                  latitude: currentLocation.latitude,
-                  longitude: currentLocation.longitude,
-                  latitudeDelta: 0.0922,
-                  longitudeDelta: 0.0421,
-               }}
-               onPress={(event) => handleMapPress(event.nativeEvent.coordinate)}
-            >
-               {markers.map((marker, index) => (
-                  <Marker
-                     key={marker.key}
-                     draggable
-                     coordinate={marker.coordinate}
-                     onDragEnd={(e) =>
-                        handleMarkerDrag(index, e.nativeEvent.coordinate)
-                     }
-                     onPress={() => handleMarkerPress(marker)}
-                  />
-               ))}
-            </MapView>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+         {currentLocation.latitude != 0 ? (
+            <View style={{ flex: 1 }}>
+               <MapView
+                  // provider={PROVIDER_GOOGLE}
+                  style={{ flex: 1 }}
+                  initialRegion={{
+                     latitude: currentLocation.latitude,
+                     longitude: currentLocation.longitude,
+                     latitudeDelta: 0.0922,
+                     longitudeDelta: 0.0421,
+                  }}
+                  onPress={(event) =>
+                     handleMapPress(event.nativeEvent.coordinate)
+                  }
+               >
+                  {markers.map((marker, index) => (
+                     <Marker
+                        key={marker.key}
+                        draggable
+                        coordinate={marker.coordinate}
+                        onDragEnd={(e) =>
+                           handleMarkerDrag(index, e.nativeEvent.coordinate)
+                        }
+                        onPress={() => handleMarkerPress(marker)}
+                     />
+                  ))}
+               </MapView>
+
+               <BottomSheet
+                  index={0}
+                  snapPoints={snapPoints}
+                  // ref={bottomSheetRef}
+                  // onChange={handleSheetChanges}
+               >
+                  <BottomSheetView style={styles.contentContainer}>
+                     <Text>Awesome 🎉</Text>
+                  </BottomSheetView>
+               </BottomSheet>
+            </View>
          ) : (
             <View
                style={{
@@ -90,10 +122,10 @@ export default function TabOneScreen() {
                   alignItems: "center",
                }}
             >
-               <Text>Loading...</Text>
+               <ActivityIndicator size={"large"} color={"dodgerblue"} />
             </View>
          )}
-      </View>
+      </GestureHandlerRootView>
    );
 }
 
@@ -109,5 +141,9 @@ const styles = StyleSheet.create({
    map: {
       width: "100%",
       height: "40%",
+   },
+   contentContainer: {
+      flex: 1,
+      alignItems: "center",
    },
 });

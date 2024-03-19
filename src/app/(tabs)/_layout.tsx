@@ -30,7 +30,7 @@ export default function TabLayout() {
          <Tabs.Screen
             name="index"
             options={{
-               title: "Map",
+               title: "Главная",
                tabBarIcon: ({ color }) => (
                   <TabBarIcon name="code" color={color} />
                ),
@@ -56,7 +56,7 @@ export default function TabLayout() {
          <Tabs.Screen
             name="two"
             options={{
-               title: "Tab Two",
+               title: "Мой профиль",
                tabBarIcon: ({ color }) => (
                   <TabBarIcon name="code" color={color} />
                ),
