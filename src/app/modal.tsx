@@ -26,30 +26,55 @@ export default function ModalScreen() {
          <Text style={styles.title}>Добавить событие</Text>
          <TextInput placeholder="Описание" style={styles.input} />
          <TextInput placeholder="Время" style={styles.input} />
-         <Pressable
-            onPress={handlePress}
-            style={{
-               marginTop: 30,
-               width: 200,
-               backgroundColor: "#4A55A2",
-               padding: 15,
-               marginLeft: "auto",
-               marginRight: "auto",
-               borderRadius: 6,
-            }}
-         >
-            <Text
+         <View style={{ flexDirection: "row", gap: 10 }}>
+            <Pressable
+               onPress={handlePress}
                style={{
-                  color: "white",
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  textAlign: "center",
+                  marginTop: 30,
+                  width: 150,
+                  backgroundColor: "#4A55A2",
+                  padding: 15,
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  borderRadius: 6,
                }}
             >
-               Сохранить
-            </Text>
-            <Text>{markers.length}</Text>
-         </Pressable>
+               <Text
+                  style={{
+                     color: "white",
+                     fontSize: 16,
+                     fontWeight: "bold",
+                     textAlign: "center",
+                  }}
+               >
+                  Сохранить
+               </Text>
+            </Pressable>
+            <Pressable
+               onPress={() => navigation.goBack()}
+               style={{
+                  marginTop: 30,
+                  width: 150,
+                  backgroundColor: "#4A55A2",
+                  padding: 15,
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  borderRadius: 6,
+               }}
+            >
+               <Text
+                  style={{
+                     color: "white",
+                     fontSize: 16,
+                     fontWeight: "bold",
+                     textAlign: "center",
+                  }}
+               >
+                  Отмена
+               </Text>
+            </Pressable>
+         </View>
+
          {/* Use a light status bar on iOS to account for the black space above the modal */}
          <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
       </View>
