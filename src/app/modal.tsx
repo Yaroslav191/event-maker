@@ -18,6 +18,7 @@ export default function ModalScreen() {
       //    key: String(markers.length), // Assign a unique key to the marker
       // };
       setMarkers([...markers, JSON.parse(newMarker)]);
+      navigation.goBack();
    };
 
    return (
