@@ -16,17 +16,21 @@ import BottomSheet, {
    BottomSheetFlatList,
    BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { MapType } from "@/src/context/MapContext";
 
 export default function TabOneScreen() {
    const navigation = useNavigation();
+   const router = useRouter();
+   const params = useLocalSearchParams();
+
+   const { markers, setMarkers } = useContext<any>(MapType);
+
    const [currentLocation, setCurrentLocation] = useState<LatLng>({
       latitude: 0,
       longitude: 0,
    });
 
-   const { markers, setMarkers } = useContext(MapType);
    // const [markers, setMarkers] = useState<MarkerInterface[]>([]);
 
    const snapPoints = useMemo(() => [75, "50%", "90%"], []);
@@ -51,9 +55,16 @@ export default function TabOneScreen() {
          coordinate: coordinate,
          key: String(markers.length), // Assign a unique key to the marker
       };
-      setMarkers([...markers, newMarker]);
+      // setMarkers([...markers, newMarker]);
 
-      navigation.navigate("modal", { test: "LOLOLO" });
+      router.push({
+         pathname: "/modal",
+         params: {
+            newMarker: JSON.stringify(newMarker),
+         },
+      });
+
+      // router.push({ pathname: "/modal", params: { test: "LOLOLO" } });
    };
 
    const handleMarkerDrag = (index: number, coordinate: LatLng) => {
@@ -92,7 +103,7 @@ export default function TabOneScreen() {
                >
                   {markers.map((marker, index) => (
                      <Marker
-                        key={marker.key}
+                        key={index}
                         draggable
                         coordinate={marker.coordinate}
                         onDragEnd={(e) =>

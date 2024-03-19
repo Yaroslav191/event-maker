@@ -3,19 +3,21 @@ import { Platform, Pressable, StyleSheet, TextInput } from "react-native";
 import { Text, View } from "@/src/components/Themed";
 import { useContext } from "react";
 import { MapType } from "../context/MapContext";
-import { useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 
-export default function ModalScreen({ route }) {
+export default function ModalScreen() {
    const navigation = useNavigation();
-   const { test } = route.params;
-   const { markers, setMarkers } = useContext(MapType);
+   const params = useLocalSearchParams();
+   const router = useRouter();
+   const { newMarker } = params;
+   const { markers, setMarkers } = useContext<any>(MapType);
 
    const handlePress = () => {
       // const newMarker = {
       //    coordinate: coordinate,
       //    key: String(markers.length), // Assign a unique key to the marker
       // };
-      // setMarkers([...markers, newMarker]);
+      setMarkers([...markers, JSON.parse(newMarker)]);
    };
 
    return (
@@ -24,9 +26,7 @@ export default function ModalScreen({ route }) {
          <TextInput placeholder="Описание" style={styles.input} />
          <TextInput placeholder="Время" style={styles.input} />
          <Pressable
-            onPress={() => {
-               handlePress;
-            }}
+            onPress={handlePress}
             style={{
                marginTop: 30,
                width: 200,
@@ -47,7 +47,7 @@ export default function ModalScreen({ route }) {
             >
                Сохранить
             </Text>
-            <Text>{test}</Text>
+            <Text>{markers.length}</Text>
          </Pressable>
          {/* Use a light status bar on iOS to account for the black space above the modal */}
          <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
