@@ -1,19 +1,24 @@
 import { createContext, useState } from "react";
 import { MarkerInterface } from "../types";
 
-const MapType = createContext({
-   markers: [],
-   setMarkers: () => {},
+interface MapContextType {
+  markers: MarkerInterface[];
+  setMarkers: (markers: MarkerInterface[]) => void;
+}
+
+const MapType = createContext<MapContextType>({
+  markers: [],
+  setMarkers: () => {},
 });
 
-const MapContext = ({ children }) => {
-   const [markers, setMarkers] = useState<MarkerInterface[]>([]);
+const MapContext: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [markers, setMarkers] = useState<MarkerInterface[]>([]);
 
-   return (
-      <MapType.Provider value={{ markers, setMarkers }}>
-         {children}
-      </MapType.Provider>
-   );
+  return (
+    <MapType.Provider value={{ markers, setMarkers }}>
+      {children}
+    </MapType.Provider>
+  );
 };
 
 export { MapType, MapContext };
