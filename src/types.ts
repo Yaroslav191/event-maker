@@ -1,8 +1,7 @@
 export interface MarkerInterface {
-    coordinate: {
-        latitude: number;
-        longitude: number;
-    },
-    key: string
+  coordinate: {
+    latitude: number;
+    longitude: number;
+  };
+  key: string;
 }
-
