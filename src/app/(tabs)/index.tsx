@@ -18,6 +18,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { MapType } from "@/src/context/MapContext";
+import axios from "axios";
 
 export default function TabOneScreen() {
   const navigation = useNavigation();
@@ -83,6 +84,28 @@ export default function TabOneScreen() {
   useEffect(() => {
     getCurrentLocation();
   }, []);
+
+  useEffect(() => {
+    const fetchMarkers = async () => {
+      try {
+        const response = await axios.get("http://localhost:4545/markers");
+        console.log("asda");
+
+        if (response.status === 200) {
+          setMarkers(response.data);
+        }
+      } catch (error) {
+        console.log(error);
+        // Handle error, e.g., show an error message to the user
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    fetchMarkers();
+  }, []); // Empty dependency array for running the effect once
+
+  console.log(markers);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

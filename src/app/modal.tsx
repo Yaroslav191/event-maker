@@ -11,6 +11,7 @@ import { useContext } from "react";
 import { MapType } from "../context/MapContext";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { MarkerInterface } from "../types";
+import axios from "axios";
 
 export default function ModalScreen() {
   const navigation = useNavigation();
@@ -20,8 +21,26 @@ export default function ModalScreen() {
   const { markers, setMarkers } = useContext<any>(MapType);
 
   const handlePress = () => {
-    setMarkers([...markers, JSON.parse(newMarker as string)]);
-    navigation.goBack();
+    const fetchMarkers = async () => {
+      try {
+        const response = await axios.get("http://192.168.100.123:8000/markers");
+        console.log("asda");
+
+        if (response.status === 200) {
+          setMarkers(response.data);
+        }
+      } catch (error) {
+        console.log(error);
+        // Handle error, e.g., show an error message to the user
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    fetchMarkers();
+
+    // setMarkers([...markers, JSON.parse(newMarker as string)]);
+    // navigation.goBack();
   };
 
   return (
@@ -85,8 +104,7 @@ export default function ModalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //  marginTop: 30,
-    //  height: "100%",
+
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
