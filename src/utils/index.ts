@@ -1,5 +1,6 @@
 import axios from "axios";
 import { MarkerInterface } from "../types";
+
 // import * as Location from "expo-location";
 
 interface FetchMarkersInterface {
@@ -7,6 +8,7 @@ interface FetchMarkersInterface {
 }
 
 export const fetchMarkers = async (
+  
   setMarkers: FetchMarkersInterface["setMarkers"]
 ) => {
   try {

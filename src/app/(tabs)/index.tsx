@@ -2,7 +2,6 @@ import {
    Alert,
    StyleSheet,
    ActivityIndicator,
-   Button,
    Image,
    Pressable,
 } from "react-native";
@@ -25,7 +24,6 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { MapType } from "@/src/context/MapContext";
-import axios from "axios";
 import { fetchMarkers } from "@/src/utils";
 
 export default function TabOneScreen() {
@@ -34,7 +32,7 @@ export default function TabOneScreen() {
    const params = useLocalSearchParams();
 
    const { markers, setMarkers } = useContext(MapType);
-
+   const [address, setAddress] = useState({});
    const [currentLocation, setCurrentLocation] = useState<LatLng>({
       latitude: 0,
       longitude: 0,
@@ -45,24 +43,113 @@ export default function TabOneScreen() {
    const getCurrentLocation = async () => {
       try {
          let { status } = await Location.requestForegroundPermissionsAsync();
+
          if (status !== "granted") {
             console.log("Permission to access location was denied");
             return;
          }
 
          let location = await Location.getCurrentPositionAsync({});
+         const { latitude, longitude } = location.coords;
          setCurrentLocation(location.coords);
+         // reverseGeocode(latitude, longitude);
+         // getAddressFromCoordinates();
+         getPlaceDetails("ChIJnQx-HSk1-EIR4aaE4hxhGAI");
       } catch (error) {
          console.error("Error getting location:", error);
       }
    };
 
-   const handleMapPress = (coordinate: LatLng) => {
+   const reverseGeocode = async (latitude: number, longitude: number) => {
+      try {
+         let lat = 52.284502970461624;
+         let long = 76.94345212348279;
+
+         const pos = await Location.reverseGeocodeAsync({
+            latitude: lat,
+            longitude: long,
+         });
+
+         // setAddress(pos);
+         // console.log("Reverse Geocoded Address:", pos);
+         return pos;
+      } catch (error) {
+         console.error("Error reverse geocoding:", error);
+      }
+   };
+
+   const getAddressFromCoordinates = async () => {
+      if (currentLocation) {
+         try {
+            const apiKey = "AIzaSyAhE5oyGpmj4LnZYc6UgkEHT78kOnu_tTg"; // Replace with your Google Maps API key
+            const latitude = 52.282636283591124;
+            const longitude = 76.94377497004324;
+            const response = await fetch(
+               `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
+            );
+            const data = await response.json();
+            console.log(data);
+            if (data.results && data.results.length > 0) {
+               // Extract the building name from the response
+               const addressComponents = data.results[0].address_components;
+               let buildingName = "Building not found";
+               // Search for various types that may represent the building name
+               const buildingNameTypes = [
+                  "premise",
+                  "subpremise",
+                  "establishment",
+                  "point_of_interest",
+                  "neighborhood",
+               ];
+               for (const type of buildingNameTypes) {
+                  const buildingNameComponent = addressComponents.find(
+                     (component) => component.types.includes(type)
+                  );
+                  if (buildingNameComponent) {
+                     buildingName = buildingNameComponent.long_name;
+                     break;
+                  }
+               }
+               // Set the building name as the address
+               setAddress(buildingName);
+            } else {
+               // No results found, set a default message
+               setAddress("Building not found");
+            }
+         } catch (error) {
+            console.error("Error fetching address:", error);
+         }
+      }
+   };
+
+   const getPlaceDetails = async (placeId) => {
+      try {
+         const apiKey = "AIzaSyAhE5oyGpmj4LnZYc6UgkEHT78kOnu_tTg"; // Replace with your Google Maps API key
+         const response = await fetch(
+            `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${apiKey}`
+         );
+         const data = await response.json();
+         console.log(data);
+         if (data.result) {
+            // Extract the name of the place
+            const placeName = data.result.name;
+            // Use the place name in your application
+            console.log("Place name:", placeName);
+         } else {
+            console.error("Place details not found");
+         }
+      } catch (error) {
+         console.error("Error fetching place details:", error);
+      }
+   };
+
+   // console.log(address);
+
+   const handleMapPress = async (coordinate: LatLng) => {
       const newMarker = {
          coordinate: coordinate,
          key: String(markers.length), // Assign a unique key to the marker
       };
-      // setMarkers([...markers, newMarker]);
 
       router.push({
          pathname: "/modal",
@@ -71,8 +158,6 @@ export default function TabOneScreen() {
             newMarker: JSON.stringify(newMarker),
          },
       });
-
-      // router.push({ pathname: "/modal", params: { test: "LOLOLO" } });
    };
 
    const handleMarkerDrag = (
@@ -85,8 +170,6 @@ export default function TabOneScreen() {
    };
 
    const handleMarkerPress = (marker: MarkerInterface) => {
-      // console.log(marker);
-
       router.push({
          pathname: "/modal",
          params: {
@@ -208,9 +291,12 @@ export default function TabOneScreen() {
                                     <Text style={{ paddingBottom: 2 }}>
                                        {marker.description}
                                     </Text>
-                                    <Text>{marker.time}</Text>
+                                    {/* <Text>{marker.time}</Text> */}
                                     <Text>
-                                       {/* {reverseGeocode(JSON.parse(marker.coordinate).coordinate)} */}
+                                       {/* {reverseGeocode(
+                                          52.2736899933709,
+                                          76.96362870172776
+                                       )} */}
                                     </Text>
                                  </View>
                                  <View>

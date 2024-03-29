@@ -46,17 +46,20 @@ app.get("/markers", (req, res) => {
       }
 
       // Execute SQL query
-      connection.query("SELECT * FROM events", (error, results, fields) => {
-         // Release the connection back to the pool
-         connection.release();
+      connection.query(
+         "SELECT * FROM events WHERE visible = 1",
+         (error, results, fields) => {
+            // Release the connection back to the pool
+            connection.release();
 
-         if (error) {
-            console.error("Error executing SQL query:", error);
-            res.status(500).json({ message: "Error executing query" });
-            return;
+            if (error) {
+               console.error("Error executing SQL query:", error);
+               res.status(500).json({ message: "Error executing query" });
+               return;
+            }
+            res.json(results); // Send query results as JSON response
          }
-         res.json(results); // Send query results as JSON response
-      });
+      );
    });
 });
 
@@ -159,3 +162,7 @@ app.put("/updateMarker/:id", (req, res) => {
       );
    });
 });
+
+//AIzaSyAhE5oyGpmj4LnZYc6UgkEHT78kOnu_tTg
+
+//ChIJdxd9pig1-EIRUZdplpzA8GI
