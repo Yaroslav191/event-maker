@@ -11,11 +11,11 @@ export const fetchMarkers = async (
   setMarkers: FetchMarkersInterface["setMarkers"]
 ) => {
   try {
-    const response = await axios.get("http://192.168.100.125:8000/markers");
+    const response = await axios.get("http://192.168.0.113:8000/markers");
 
     if (response.status === 200) {
       setMarkers(response.data);
-      console.log(response.data[0].coordinate);
+      // console.log(JSON.parse(response.data[1].coordinate).data.types);
     }
   } catch (error) {
     console.log(error);
