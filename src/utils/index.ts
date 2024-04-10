@@ -11,7 +11,7 @@ export const fetchMarkers = async (
   setMarkers: FetchMarkersInterface["setMarkers"]
 ) => {
   try {
-    const response = await axios.get("http://192.168.100.123:8000/markers");
+    const response = await axios.get("http://192.168.0.113:8000/markers");
 
     if (response.status === 200) {
       setMarkers(response.data);
