@@ -1,35 +1,81 @@
-import { StyleSheet } from "react-native";
-
-import EditScreenInfo from "@/src/components/EditScreenInfo";
-import { Text, View } from "@/src/components/Themed";
+import React, { useState } from "react";
+import { View, Button, Image, StyleSheet } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
 
 export default function TabTwoScreen() {
-   return (
-      <View style={styles.container}>
-         <Text style={styles.title}>Tab Two</Text>
-         <View
-            style={styles.separator}
-            lightColor="#eee"
-            darkColor="rgba(255,255,255,0.1)"
-         />
-         <EditScreenInfo path="app/(tabs)/two.tsx" />
-      </View>
-   );
+  const [selectedImage, setSelectedImage] = useState<any>(null);
+
+  const pickImage = async () => {
+    // Request permission to access the media library
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+      return;
+    }
+
+    // Pick image from gallery
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri); // Make sure to update state here
+      // console.log(result.assets[0].uri);
+    }
+  };
+
+  // Function to upload image
+  const uploadImage = async () => {
+    if (!selectedImage) return;
+
+    // Create a new FormData object
+    const formData = new FormData();
+    formData.append("image", {
+      uri: selectedImage,
+      name: "photo.jpg", // File name you want
+      type: "image/jpeg", // File type
+    });
+
+    // Send the request using axios
+    try {
+      const response = await axios.post(
+        "http://192.168.100.123:8000/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      // Handle the response
+      console.log("Image uploaded:", response.data);
+    } catch (error) {
+      console.error("Image upload error:", error);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Button title="Pick an image from camera roll" onPress={pickImage} />
+      <Button title="Upload Image" onPress={uploadImage} />
+      {selectedImage && (
+        <Image
+          source={{ uri: selectedImage }}
+          style={{ width: 200, height: 200 }}
+        />
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-   container: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-   },
-   title: {
-      fontSize: 20,
-      fontWeight: "bold",
-   },
-   separator: {
-      marginVertical: 30,
-      height: 1,
-      width: "80%",
-   },
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
