@@ -1,7 +1,9 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
 const passport = require("passport");
 const mysql = require("mysql2");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const multer = require("multer");
 const path = require("path");
@@ -20,7 +22,7 @@ app.listen(port, () => {
 });
 
 const pool = mysql.createPool({
-   host: "liderpma.finistcom.kz",
+   host: "tools.goo.kz",
    user: "eventmakeruser",
    password: "eventmaker0947",
    database: "eventmaker", // Add your database name here
@@ -129,7 +131,7 @@ app.post("/saveMarker", async (req, res) => {
                   results.affectedRows,
                   "rows affected"
                );
-               res.status(200).json({
+               res.status(201).json({
                   message: "Data inserted successfully",
                   affectedRows: results.affectedRows,
                });
@@ -189,10 +191,13 @@ app.put("/updateMarker/:id", (req, res) => {
 
 //endpoint for registration of the user
 
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
    try {
       console.log("register");
-      const { name, email, password, image } = req.body;
+      const { name, email, password } = req.body;
+
+      const salt = await bcrypt.genSalt();
+      const psswordHash = await bcrypt.hash(password, salt);
 
       // Get a connection from the pool
       pool.getConnection((err, connection) => {
@@ -207,10 +212,10 @@ app.post("/register", (req, res) => {
 
          // Execute the SQL query using the obtained connection
          const sql =
-            "INSERT INTO users (name, email, password, image) VALUES (?, ?, ?, ?)";
+            "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
          connection.execute(
             sql,
-            [name, email, password, image],
+            [name, email, psswordHash],
             (error, results) => {
                // Release the connection back to the pool
                connection.release();
@@ -236,6 +241,106 @@ app.post("/register", (req, res) => {
             }
          );
       });
+   } catch (error) {
+      console.error("Error saving marker:", error);
+      res.status(500).json({
+         message: "An internal server error occurred",
+         error: error,
+      });
+   }
+});
+
+//function to create a token for the user
+const createToken = (userId) => {
+   // Set the token payload
+   const payload = {
+      userId: userId,
+   };
+
+   // Generate the token with a secret key and expiration time
+   const token = jwt.sign(payload, "Q$r2K6W8n!jCW%Zk", { expiresIn: "1h" });
+
+   return token;
+};
+
+//endpoint for logging in of that particular user
+app.post("/login", (req, res) => {
+   try {
+      const { email, password } = req.body;
+
+      // Get a connection from the pool
+      pool.getConnection((err, connection) => {
+         if (err) {
+            console.error("Error getting MySQL connection:", err);
+            res.status(500).json({
+               message: "Error getting database connection",
+               error: err,
+            });
+            return;
+         }
+
+         //check if the email and password are provided
+         if (!email || !password) {
+            return res
+               .status(404)
+               .json({ message: "Email and the password are required" });
+         }
+
+         // Execute SQL query
+         connection.query(
+            "SELECT * FROM users WHERE email = ?",
+            [email],
+            async (error, results, fields) => {
+               // Release the connection back to the pool
+               connection.release();
+
+               if (error) {
+                  console.error("Error executing SQL query:", error);
+                  res.status(500).json({ message: "Error executing query" });
+                  return;
+               }
+               if (!results.length) {
+                  return res.status(404).json({ message: "User not found" });
+               }
+
+               const isMatch = await bcrypt.compare(
+                  password,
+                  results[0].password
+               );
+
+               if (!isMatch)
+                  return res.status(400).json({ message: "Invalid Password!" });
+
+               const token = createToken(results[0].id);
+               res.status(200).json({ token });
+
+               // console.log(results[0].password, password);
+
+               // res.json(results); // Send query results as JSON response
+            }
+         );
+      });
+
+      //check for that user in the database
+      // User.findOne({ email })
+      //    .then((user) => {
+      //       if (!user) {
+      //          //user not found
+      //          return res.status(404).json({ message: "User not found" });
+      //       }
+
+      //       //compare the provided passwords with the password in the database
+      //       if (user.password !== password) {
+      //          return res.status(404).json({ message: "Invalid Password!" });
+      //       }
+
+      //       const token = createToken(user._id);
+      //       res.status(200).json({ token });
+      //    })
+      //    .catch((error) => {
+      //       console.log("error in finding the user", error);
+      //       res.status(500).json({ message: "Internal server Error!" });
+      //    });
    } catch (error) {
       console.error("Error saving marker:", error);
       res.status(500).json({

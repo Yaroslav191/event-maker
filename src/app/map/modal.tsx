@@ -10,11 +10,11 @@ import {
 } from "react-native";
 import { Text, View } from "@/src/components/Themed";
 import { useContext, useEffect, useState } from "react";
-import { MapType } from "../context/MapContext";
+import { MapType } from "../../context/MapContext";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { MarkerInterface } from "../types";
+import { MarkerInterface } from "../../types";
 import axios from "axios";
-import { fetchMarkers } from "../utils";
+import { fetchMarkers } from "../../utils";
 
 export default function ModalScreen() {
    const navigation = useNavigation();

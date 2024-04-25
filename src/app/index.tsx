@@ -27,21 +27,23 @@ const index = () => {
          name: name,
          email: email,
          password: password,
-         image: image,
+         // image: image,
       };
 
       axios
-         .post("http://192.168.0.113:8000/register", user)
+         .post("http://192.168.0.113:8000/login", user)
          .then((response) => {
-            console.log(response);
+            const token = response.data.token;
+
+            console.log(response.data.token);
             Alert.alert(
                "Registration successful",
                "You have been registered Successfully"
             );
-            setName("");
-            setEmail("");
-            setPassword("");
-            setImage("");
+            // setName("");
+            // setEmail("");
+            // setPassword("");
+            // setImage("");
          })
          .catch((error) => {
             Alert.alert(
@@ -142,7 +144,7 @@ const index = () => {
                      placeholderTextColor={"black"}
                   />
                </View>
-               <View style={{ marginTop: 10 }}>
+               {/* <View style={{ marginTop: 10 }}>
                   <Text
                      style={{ fontSize: 18, fontWeight: "600", color: "gray" }}
                   >
@@ -161,7 +163,7 @@ const index = () => {
                      placeholder="Image"
                      placeholderTextColor={"black"}
                   />
-               </View>
+               </View> */}
                <Pressable
                   onPress={handleRegister}
                   style={{
