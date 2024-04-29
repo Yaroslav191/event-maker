@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { View, Button, Image, StyleSheet } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
+import { ref, uploadBytes } from "firebase/storage";
+import { storage } from "@/firebase/config";
 
 export default function TabTwoScreen() {
   const [selectedImage, setSelectedImage] = useState<any>(null);
@@ -28,6 +30,17 @@ export default function TabTwoScreen() {
     }
   };
 
+  const submitData = () => {
+    const storageRef = ref(storage, "image");
+
+    uploadBytes(storageRef, selectedImage)
+      .then((snapshot) => {
+        console.log("Uploaded a blob or file!");
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+  };
   // Function to upload image
   const uploadImage = async () => {
     if (!selectedImage) return;
@@ -62,6 +75,7 @@ export default function TabTwoScreen() {
     <View style={styles.container}>
       <Button title="Pick an image from camera roll" onPress={pickImage} />
       <Button title="Upload Image" onPress={uploadImage} />
+      <Button title="Upload Image to Firebase" onPress={submitData} />
       {selectedImage && (
         <Image
           source={{ uri: selectedImage }}
