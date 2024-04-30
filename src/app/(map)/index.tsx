@@ -23,14 +23,19 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import {
    Link,
+   Redirect,
    useLocalSearchParams,
    useNavigation,
    useRouter,
 } from "expo-router";
 import { MapType } from "@/src/context/MapContext";
 import { fetchMarkers, getPlaceDetails } from "@/src/utils";
+import useAuthToken from "@/src/utils/hooks";
 
 export default function TabOneScreen() {
+   const { token, loading } = useAuthToken();
+
+   console.log(token + "ASS");
    const navigation = useNavigation();
    const router = useRouter();
    const params = useLocalSearchParams();
@@ -115,6 +120,14 @@ export default function TabOneScreen() {
    useEffect(() => {
       fetchMarkers(setMarkers as any);
    }, []); // Empty dependency array for running the effect once
+
+   if (loading) {
+      return <ActivityIndicator />;
+   }
+
+   if (!token) {
+      return <Redirect href={"/sign-in"} />;
+   }
 
    return (
       <GestureHandlerRootView style={{ flex: 1 }}>

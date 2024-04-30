@@ -1,5 +1,7 @@
 import axios from "axios";
 import { MarkerInterface } from "../types";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { storage } from "@/firebase/config";
 
 // import * as Location from "expo-location";
 
@@ -52,11 +54,27 @@ export async function getPlaceDetails(latitude: number, longitude: number) {
   }
 }
 
-// getPlaceDetails(latitude, longitude)
-//   .then((placeDetails) => {
-//     console.log(placeDetails);
-//     // Do something with place details
-//   })
-//   .catch((error) => {
-//     console.error("Error:", error);
-//   });
+export const getFirebaseImage = (imgName: string) => {
+  getDownloadURL(ref(storage, imgName))
+    .then((url) => {
+      // `url` is the download URL for 'images/stars.jpg'
+  
+      // This can be downloaded directly:
+      const xhr = new XMLHttpRequest();
+      xhr.responseType = 'blob';
+      xhr.onload = (event) => {
+        const blob = xhr.response;
+      };
+      xhr.open('GET', url);
+      xhr.send();
+  
+      console.log(url)
+
+      // Or inserted into an <img> element
+      // const img = document.getElementById('myimg');
+      // img.setAttribute('src', url);
+    })
+    .catch((error) => {
+      // Handle any errors
+    });
+}
