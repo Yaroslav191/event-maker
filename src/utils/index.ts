@@ -13,7 +13,7 @@ export const fetchMarkers = async (
   setMarkers: FetchMarkersInterface["setMarkers"]
 ) => {
   try {
-    const response = await axios.get("http://192.168.0.113:8000/markers");
+    const response = await axios.get("http://192.168.100.125:8000/markers");
 
     if (response.status === 200) {
       setMarkers(response.data);
@@ -58,17 +58,17 @@ export const getFirebaseImage = (imgName: string) => {
   getDownloadURL(ref(storage, imgName))
     .then((url) => {
       // `url` is the download URL for 'images/stars.jpg'
-  
+
       // This can be downloaded directly:
       const xhr = new XMLHttpRequest();
-      xhr.responseType = 'blob';
+      xhr.responseType = "blob";
       xhr.onload = (event) => {
         const blob = xhr.response;
       };
-      xhr.open('GET', url);
+      xhr.open("GET", url);
       xhr.send();
-  
-      console.log(url)
+
+      console.log(url);
 
       // Or inserted into an <img> element
       // const img = document.getElementById('myimg');
@@ -77,4 +77,4 @@ export const getFirebaseImage = (imgName: string) => {
     .catch((error) => {
       // Handle any errors
     });
-}
+};
