@@ -2,6 +2,7 @@ import axios from "axios";
 import { MarkerInterface } from "../types";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { storage } from "@/firebase/config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // import * as Location from "expo-location";
 
@@ -16,8 +17,8 @@ export const fetchMarkers = async (
     const response = await axios.get("http://192.168.100.125:8000/markers");
 
     if (response.status === 200) {
+      // setUserId(userId);
       setMarkers(response.data);
-      // console.log(JSON.parse(response.data[1].coordinate).data.types);
     }
   } catch (error) {
     console.log(error);

@@ -35,17 +35,12 @@ import useAuthToken from "@/src/utils/hooks";
 export default function TabOneScreen() {
   const { token, loading } = useAuthToken();
 
-  console.log(token + "ASS");
   const navigation = useNavigation();
   const router = useRouter();
   const params = useLocalSearchParams();
 
-  const { markers, setMarkers } = useContext(MapType);
-  const { currentLocation, setCurrentLocation } = useContext(MapType);
-  //   const [currentLocation, setCurrentLocation] = useState<LatLng>({
-  //     latitude: 0,
-  //     longitude: 0,
-  //   });
+  const { markers, setMarkers, setCurrentLocation, currentLocation, userId } =
+    useContext(MapType);
 
   const snapPoints = useMemo(() => [75, "50%", "90%"], []);
 
@@ -108,9 +103,9 @@ export default function TabOneScreen() {
         title: marker.title,
         description: marker.description,
         time: marker.time,
-        coordinate: marker.coordinate as any,
+        coordinate: marker.coordinate,
       },
-    });
+    } as any);
   };
 
   useEffect(() => {
@@ -118,10 +113,9 @@ export default function TabOneScreen() {
   }, []);
 
   useEffect(() => {
+    console.log(userId);
     fetchMarkers(setMarkers as any);
   }, []); // Empty dependency array for running the effect once
-
-  //   console.log(markers);
 
   if (loading) {
     return <ActivityIndicator />;
@@ -171,7 +165,9 @@ export default function TabOneScreen() {
               <Text>Список мероприятий 🎉</Text>
               {markers.map((marker, index) => {
                 return (
-                  <Pressable onPress={() => handleMarkerPress(marker)}>
+                  <Pressable
+                    onPress={() => handleMarkerPress(marker)}
+                    key={marker.id}>
                     <View
                       style={{
                         flexDirection: "row",

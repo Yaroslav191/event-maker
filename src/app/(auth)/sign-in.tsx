@@ -1,11 +1,12 @@
 import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Button from "../../components/Button";
 import Colors from "../../constants/Colors";
 import { Link, Stack } from "expo-router";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MapType } from "@/src/context/MapContext";
 
 const SignInScreen = () => {
   const router = useRouter();
@@ -13,6 +14,7 @@ const SignInScreen = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const { setUserId } = useContext(MapType);
 
   const handleRegister = async () => {
     try {
@@ -26,9 +28,10 @@ const SignInScreen = () => {
         user
       );
 
-      console.log(response);
-
       const token = response.data.token;
+      const userId = response.data.userId;
+
+      setUserId(userId);
 
       await AsyncStorage.setItem("token", token);
 

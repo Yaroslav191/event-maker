@@ -7,6 +7,8 @@ export interface MapContextType {
   setMarkers: (markers: MarkerInterface[]) => void;
   currentLocation: LatLng;
   setCurrentLocation: (currentLocation: LatLng) => void;
+  userId: Number;
+  setUserId: (userId: number) => void;
 }
 
 const MapType = createContext<MapContextType>({
@@ -17,6 +19,8 @@ const MapType = createContext<MapContextType>({
     longitude: 0,
   },
   setCurrentLocation: () => {},
+  userId: 0,
+  setUserId: () => {},
 });
 
 const MapContext: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -25,10 +29,18 @@ const MapContext: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     latitude: 0,
     longitude: 0,
   });
+  const [userId, setUserId] = useState(0);
 
   return (
     <MapType.Provider
-      value={{ markers, setMarkers, currentLocation, setCurrentLocation }}>
+      value={{
+        markers,
+        setMarkers,
+        currentLocation,
+        setCurrentLocation,
+        userId,
+        setUserId,
+      }}>
       {children}
     </MapType.Provider>
   );

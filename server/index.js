@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const multer = require("multer");
 const path = require("path");
+const verifyToken = require("./middleware/auth");
 
 const app = express();
 const port = 8000;
@@ -306,7 +307,7 @@ app.post("/login", (req, res) => {
             return res.status(400).json({ message: "Invalid Password!" });
 
           const token = createToken(results[0].id);
-          res.status(200).json({ token });
+          res.status(200).json({ token, userId: results[0].id });
         }
       );
     });
@@ -318,7 +319,3 @@ app.post("/login", (req, res) => {
     });
   }
 });
-
-//AIzaSyAhE5oyGpmj4LnZYc6UgkEHT78kOnu_tTg
-
-//ChIJdxd9pig1-EIRUZdplpzA8GI
