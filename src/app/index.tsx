@@ -5,17 +5,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import useAuthToken from "../utils/hooks";
 
 const index = () => {
-  const { token, loading } = useAuthToken();
+   const { token, loading } = useAuthToken();
 
-  if (loading) {
-    return <ActivityIndicator />;
-  }
+   if (loading) {
+      return <ActivityIndicator />;
+   }
 
-  if (token) {
-    return <Redirect href={"/(map)"} />;
-  } else {
-    return <Redirect href={"/sign-in"} />;
-  }
+   if (token) {
+      return <Redirect href={"/(tabs)/(map)/"} />;
+   } else {
+      return <Redirect href={"/sign-in"} />;
+   }
 };
 
 export default index;

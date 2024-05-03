@@ -39,8 +39,6 @@ export default function TabTwoScreen() {
       const name = new Date().getTime();
       setImageName(name);
 
-      console.log(blob);
-
       const storageRef = ref(storage, "image" + name);
 
       uploadBytesResumable(storageRef, blob)
@@ -67,7 +65,7 @@ export default function TabTwoScreen() {
       // Send the request using axios
       try {
          const response = await axios.post(
-            "http://192.168.100.123:8000/upload",
+            "http://192.168.0.113:8000/upload",
             formData,
             {
                headers: {

@@ -8,39 +8,43 @@ import Colors from "../../constants/Colors";
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
  */
 function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
+   name: React.ComponentProps<typeof FontAwesome>["name"];
+   color: string;
 }) {
-  return <FontAwesome size={20} style={{ marginBottom: -3 }} {...props} />;
+   return <FontAwesome size={20} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+   const colorScheme = useColorScheme();
 
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-      }}>
-      {/* <Tabs.Screen name="index" options={{ href: null }} /> */}
-      <Tabs.Screen
-        name="map"
-        options={{
-          title: "Карта",
-          headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="cutlery" color={color} />
-          ),
-        }}
-      />
+   return (
+      <Tabs
+         screenOptions={{
+            tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+         }}
+      >
+         {/* <Tabs.Screen name="index" options={{ href: null }} /> */}
+         <Tabs.Screen
+            name="(map)"
+            options={{
+               title: "Карта",
+               headerShown: false,
+               tabBarIcon: ({ color }) => (
+                  <TabBarIcon name="map" color={color} />
+               ),
+            }}
+         />
 
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Профиль",
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
-        }}
-      />
-    </Tabs>
-  );
+         <Tabs.Screen
+            name="profile"
+            options={{
+               title: "Профиль",
+               headerShown: false,
+               tabBarIcon: ({ color }) => (
+                  <TabBarIcon name="user" color={color} />
+               ),
+            }}
+         />
+      </Tabs>
+   );
 }
