@@ -2,7 +2,7 @@ import axios from "axios";
 import { MarkerInterface } from "../types";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { storage } from "@/firebase/config";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LOCALHOST } from "@env";
 
 // import * as Location from "expo-location";
 
@@ -14,7 +14,7 @@ export const fetchMarkers = async (
   setMarkers: FetchMarkersInterface["setMarkers"]
 ) => {
   try {
-    const response = await axios.get("http://192.168.0.113:8000/markers");
+    const response = await axios.get(`http://${LOCALHOST}:8000/markers`);
 
     if (response.status === 200) {
       // setUserId(userId);
