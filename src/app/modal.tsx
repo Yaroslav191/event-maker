@@ -67,7 +67,7 @@ export default function ModalScreen() {
         id_user: 1,
       };
       const response = axios
-        .put(`http://${LOCALHOST}/:8000/updateMarker/${id}`, data)
+        .put(`http://${LOCALHOST}:8000/updateMarker/${id}`, data)
         .then(() => {
           fetchMarkers(setMarkers);
           navigation.goBack();

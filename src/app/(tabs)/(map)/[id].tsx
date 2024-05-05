@@ -1,10 +1,9 @@
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, Stack } from "expo-router";
 import React, { useContext, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { MapType } from "../../../context/MapContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useRoute } from "@react-navigation/native";
 
 const EventDetailsScreen = () => {
   const params = useLocalSearchParams();
@@ -15,6 +14,7 @@ const EventDetailsScreen = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
+        <Stack.Screen options={{ title: title as string | undefined }} />
         <MapView
           style={{ height: "35%" }}
           initialRegion={{

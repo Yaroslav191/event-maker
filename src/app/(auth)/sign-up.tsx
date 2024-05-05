@@ -14,20 +14,24 @@ const SignUpScreen = () => {
   const router = useRouter();
 
   async function signUpWithEmail() {
-    if (email !== "" && password !== "") {
-      const user = {
-        email: email,
-        password: password,
-      };
+    try {
+      if (email !== "" && password !== "") {
+        const user = {
+          email: email,
+          password: password,
+        };
 
-      const response = await axios.post(
-        `http://${LOCALHOST}/:8000/register`,
-        user
-      );
+        const response = await axios.post(
+          `http://192.168.100.125/:8000/register`,
+          user
+        );
 
-      router.push({
-        pathname: "/sign-in",
-      });
+        router.push({
+          pathname: "/sign-in",
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 

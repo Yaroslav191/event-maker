@@ -2,7 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { View, Button, Image, StyleSheet, Text, Pressable } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
-import { ref, uploadBytesResumable } from "firebase/storage";
+import {
+  ref,
+  uploadBytesResumable,
+  getStorage,
+  getDownloadURL,
+} from "firebase/storage";
 import { storage } from "@/firebase/config";
 import { getFirebaseImage } from "@/src/utils";
 import {
@@ -49,7 +54,7 @@ export default function TabTwoScreen() {
     const uniqNumber = new Date().getTime();
     setImageName("image" + uniqNumber);
 
-    const storageRef = ref(storage, "image" + uniqNumber);
+    const storageRef = ref(storage, imageName);
 
     const data = {
       name: name,
@@ -57,45 +62,15 @@ export default function TabTwoScreen() {
       image: imageName,
     };
 
-    axios.put(`http://${LOCALHOST}/updateUser/${userId}`, data);
+    axios.put(`http://${LOCALHOST}:8000/updateUser/${userId}`, data);
 
-    // uploadBytesResumable(storageRef, blob)
-    //    .then((snapshot) => {
-    //       console.log("Uploaded a blob or file!");
-    //    })
-    //    .catch((error: any) => {
-    //       console.log(error);
-    //    });
-  };
-
-  // Function to upload image
-  const uploadImage = async () => {
-    if (!selectedImage) return;
-
-    // Create a new FormData object
-    const formData = new FormData();
-    // formData.append("image", {
-    //    uri: selectedImage,
-    //    name: "photo.jpg", // File name you want
-    //    type: "image/jpeg", // File type
-    // });
-
-    // Send the request using axios
-    try {
-      const response = await axios.post(
-        `http://${LOCALHOST}/:8000/upload`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      // Handle the response
-      console.log("Image uploaded:", response.data);
-    } catch (error) {
-      console.error("Image upload error:", error);
-    }
+    uploadBytesResumable(storageRef, blob)
+      .then((snapshot) => {
+        console.log("Uploaded a blob or file!");
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
   };
 
   const onSavePress = () => {
@@ -114,8 +89,30 @@ export default function TabTwoScreen() {
           const data = response.data[0];
           setName(data.name);
           setEmail(data.email);
-          setSelectedImage(data.image);
-          console.log(data);
+          // setSelectedImage(data.image);
+
+          if (!data.image) return;
+
+          const storage = getStorage();
+          getDownloadURL(ref(storage, data.image))
+            .then((url) => {
+              // `url` is the download URL for 'images/stars.jpg'
+
+              // This can be downloaded directly:
+              const xhr = new XMLHttpRequest();
+              xhr.responseType = "blob";
+              xhr.onload = (event) => {
+                const blob = xhr.response;
+              };
+              xhr.open("GET", url);
+              xhr.send();
+
+              setSelectedImage(url);
+              console.log(url);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         }
       } catch (error) {
         console.log(error);
@@ -258,34 +255,12 @@ export default function TabTwoScreen() {
         <Text style={{ textAlign: "center", color: "#fff" }}>Сохранить</Text>
       </Pressable>
     </View>
-    // <View style={styles.container}>
-    //    <Button title="Pick an image from camera roll" onPress={pickImage} />
-    //    <Button title="Upload Image" onPress={uploadImage} />
-    //    <Button
-    //       title="Upload Image to Firebase"
-    //       onPress={() => {
-    //          submitData(selectedImage);
-    //       }}
-    //    />
-    //    <Button
-    //       title="get Image from Firebase"
-    //       onPress={() => {
-    //          getFirebaseImage("image1714459308929");
-    //       }}
-    //    />
-    //    {selectedImage && (
-    //       <Image
-    //          source={{ uri: selectedImage }}
-    //          style={{ width: 200, height: 200 }}
-    //       />
-    //    )}
-    // </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
+    marginTop: 50,
     flex: 1,
     alignItems: "center",
     paddingHorizontal: 10,

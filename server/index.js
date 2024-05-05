@@ -65,7 +65,7 @@ app.put("/updateUser/:id", (req, res) => {
   const userId = req.params.id;
   const { name, email, image } = req.body;
 
-  console.log(req.body, userId);
+  console.log(req.body, userId + "ass");
 
   // Get a connection from the pool
   pool.getConnection((err, connection) => {
@@ -324,8 +324,8 @@ const createToken = (userId) => {
 
 //endpoint for logging in of that particular user
 app.post("/login", (req, res) => {
+  console.log("login");
   try {
-    console.log("login");
     const { email, password } = req.body;
 
     // Get a connection from the pool

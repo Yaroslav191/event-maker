@@ -23,13 +23,8 @@ const SignInScreen = () => {
         email: email,
         password: password,
       };
-      const local = LOCALHOST;
-      console.log(local);
 
-      const response = await axios.post(
-        `http://192.168.100.125/:8000/login`,
-        user
-      );
+      const response = await axios.post(`http://${LOCALHOST}:8000/login`, user);
       console.log(response);
       const token = response.data.token;
       const userId = response.data.userId;
@@ -44,6 +39,7 @@ const SignInScreen = () => {
         pathname: "/(map)",
       });
     } catch (error: any) {
+      console.log(error);
       setError(error?.response?.data?.message);
     }
   };
