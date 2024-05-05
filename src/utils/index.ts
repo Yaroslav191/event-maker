@@ -1,10 +1,53 @@
 import axios from "axios";
 import { MarkerInterface } from "../types";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, getDownloadURL, listAll } from "firebase/storage";
 import { storage } from "@/firebase/config";
 import { LOCALHOST } from "@env";
 
-// import * as Location from "expo-location";
+export const getFirebaseImgUrl = () => {
+  // const storage = getStorage();
+
+  // Create a reference under which you want to list
+  const listRef = ref(storage);
+
+  // Find all the prefixes and items.
+  listAll(listRef)
+    .then((res) => {
+      // Loop through the list of items
+      res.items.forEach(async (itemRef) => {
+        try {
+          // Get the download URL for each file item
+          const url = await getDownloadURL(itemRef);
+          console.log("Download URL:", url);
+          // Here, you can store or process the download URL as needed
+        } catch (error) {
+          // Handle errors
+          console.error("Error getting download URL:", error);
+        }
+      });
+    })
+    .catch((error) => {
+      // Uh-oh, an error occurred!
+    });
+
+  // getDownloadURL(ref(storage, image))
+  //   .then((url) => {
+  //     const xhr = new XMLHttpRequest();
+  //     xhr.responseType = "blob";
+  //     xhr.onload = (event) => {
+  //       const blob = xhr.response;
+  //     };
+  //     xhr.open("GET", url);
+  //     xhr.send();
+  //     console.log(url);
+  //     return url;
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //   });
+};
+
+getFirebaseImgUrl();
 
 interface FetchMarkersInterface {
   setMarkers: (merker: MarkerInterface) => void;

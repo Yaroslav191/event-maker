@@ -22,6 +22,7 @@ export default function ModalScreen() {
   const router = useRouter();
   const { newMarker, id, titleParam, descriptionParam, timeParam } = params;
   const { markers, setMarkers } = useContext<any>(MapType);
+  const { userId } = useContext(MapType);
 
   const [title, setTitle] = useState<string>("");
   const [descr, setDescr] = useState<string>("");
@@ -37,7 +38,7 @@ export default function ModalScreen() {
             coordinate: newMarker,
             time: time,
             visible: "1",
-            id_user: 1,
+            id_user: userId,
           };
 
           const response = await axios.post(

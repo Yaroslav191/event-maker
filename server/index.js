@@ -106,7 +106,7 @@ app.get("/markers", (req, res) => {
 
     // Execute SQL query
     connection.query(
-      "SELECT * FROM events WHERE visible = 1",
+      "SELECT * FROM events LEFT JOIN users ON users.id = events.id_user WHERE events.visible = 1",
       (error, results, fields) => {
         // Release the connection back to the pool
         connection.release();

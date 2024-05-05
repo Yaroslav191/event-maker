@@ -29,7 +29,7 @@ import {
   useRouter,
 } from "expo-router";
 import { MapType } from "@/src/context/MapContext";
-import { fetchMarkers, getPlaceDetails } from "@/src/utils";
+import { fetchMarkers, getPlaceDetails, getFirebaseImgUrl } from "@/src/utils";
 import useAuthToken from "@/src/utils/hooks";
 
 export default function TabOneScreen() {
@@ -167,7 +167,7 @@ export default function TabOneScreen() {
                 return (
                   <Pressable
                     onPress={() => handleMarkerPress(marker)}
-                    key={marker.id}>
+                    key={index}>
                     <View
                       style={{
                         flexDirection: "row",
