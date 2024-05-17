@@ -19,365 +19,369 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 
 app.listen(port, () => {
-  console.log("Server running on port", port);
+   console.log("Server running on port", port);
 });
 
 const pool = mysql.createPool({
-  host: "tools.goo.kz",
-  user: "eventmakeruser",
-  password: "eventmaker0947",
-  database: "eventmaker", // Add your database name here
+   host: "tools.goo.kz",
+   user: "eventmakeruser",
+   password: "eventmaker0947",
+   database: "eventmaker", // Add your database name here
 });
 
 // Configure multer
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Specify where to save the uploaded files
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Use timestamp as filename
-  },
+   destination: function (req, file, cb) {
+      cb(null, "uploads/"); // Specify where to save the uploaded files
+   },
+   filename: function (req, file, cb) {
+      cb(null, Date.now() + path.extname(file.originalname)); // Use timestamp as filename
+   },
 });
 
 const upload = multer({ storage: storage });
 
 // Route to handle file upload
 app.post("/upload", upload.single("image"), (req, res) => {
-  if (req.file) {
-    console.log("Received file:", req.file);
-    res.status(200).json({ message: "File uploaded successfully!" });
-  } else {
-    res.status(400).json({ message: "No file uploaded" });
-  }
+   if (req.file) {
+      console.log("Received file:", req.file);
+      res.status(200).json({ message: "File uploaded successfully!" });
+   } else {
+      res.status(400).json({ message: "No file uploaded" });
+   }
 });
 
 // Test the connection pool
 pool.getConnection((err, connection) => {
-  if (err) {
-    console.error("Error connecting to MySQL database:", err);
-    return;
-  }
-  console.log("Connected to MySQL database!");
-  connection.release(); // Release the connection back to the pool
+   if (err) {
+      console.error("Error connecting to MySQL database:", err);
+      return;
+   }
+   console.log("Connected to MySQL database!");
+   connection.release(); // Release the connection back to the pool
 });
 
 app.put("/updateUser/:id", (req, res) => {
-  const userId = req.params.id;
-  const { name, email, image } = req.body;
+   const userId = req.params.id;
+   const { name, email, image } = req.body;
 
-  console.log(req.body, userId + "ass");
+   console.log(req.body, userId + "ass");
 
-  // Get a connection from the pool
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.error("Error getting MySQL connection:", err);
-      res.status(500).json({ message: "Error connecting to database" });
-      return;
-    }
-
-    // Execute SQL query
-    connection.query(
-      "UPDATE users SET name = ?, email = ?, image = ? WHERE id = ?",
-      [name, email, image, userId],
-      (error, results, fields) => {
-        // Release the connection back to the pool
-        connection.release();
-
-        if (error) {
-          console.error("Error executing SQL query:", error);
-          res.status(500).json({ message: "Error executing query" });
-          return;
-        }
-        res.status(200).json(results); // Send query results as JSON response
+   // Get a connection from the pool
+   pool.getConnection((err, connection) => {
+      if (err) {
+         console.error("Error getting MySQL connection:", err);
+         res.status(500).json({ message: "Error connecting to database" });
+         return;
       }
-    );
-  });
+
+      // Execute SQL query
+      connection.query(
+         "UPDATE users SET name = ?, email = ?, image = ? WHERE id = ?",
+         [name, email, image, userId],
+         (error, results, fields) => {
+            // Release the connection back to the pool
+            connection.release();
+
+            if (error) {
+               console.error("Error executing SQL query:", error);
+               res.status(500).json({ message: "Error executing query" });
+               return;
+            }
+            res.status(200).json(results); // Send query results as JSON response
+         }
+      );
+   });
 });
 
 app.get("/markers", (req, res) => {
-  // Get a connection from the pool
-  console.log("markers");
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.error("Error getting MySQL connection:", err);
-      res.status(500).json({ message: "Error connecting to database" });
-      return;
-    }
-
-    // Execute SQL query
-    connection.query(
-      "SELECT * FROM events LEFT JOIN users ON users.id = events.id_user WHERE events.visible = 1",
-      (error, results, fields) => {
-        // Release the connection back to the pool
-        connection.release();
-
-        if (error) {
-          console.error("Error executing SQL query:", error);
-          res.status(500).json({ message: "Error executing query" });
-          return;
-        }
-        res.status(200).json(results); // Send query results as JSON response
+   // Get a connection from the pool
+   console.log("markers");
+   pool.getConnection((err, connection) => {
+      if (err) {
+         console.error("Error getting MySQL connection:", err);
+         res.status(500).json({ message: "Error connecting to database" });
+         return;
       }
-    );
-  });
+
+      // Execute SQL query
+      connection.query(
+         "SELECT * FROM events LEFT JOIN users ON users.id = events.id_user WHERE events.visible = 1",
+         (error, results, fields) => {
+            // Release the connection back to the pool
+            connection.release();
+
+            if (error) {
+               console.error("Error executing SQL query:", error);
+               res.status(500).json({ message: "Error executing query" });
+               return;
+            }
+            res.status(200).json(results); // Send query results as JSON response
+         }
+      );
+   });
 });
 
 app.get("/user/:id", (req, res) => {
-  const userId = req.params.id;
+   const userId = req.params.id;
 
-  console.log(userId);
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.error("Error getting MySQL connection:", err);
-      res.status(500).json({ message: "Error connecting to database" });
-      return;
-    }
-
-    // Execute SQL query
-    connection.query(
-      "SELECT * FROM users WHERE id = ?",
-      [userId],
-      (error, results, fields) => {
-        // Release the connection back to the pool
-        connection.release();
-
-        if (error) {
-          console.error("Error executing SQL query:", error);
-          res.status(500).json({ message: "Error executing query" });
-          return;
-        }
-        res.status(200).json(results); // Send query results as JSON response
+   console.log(userId);
+   pool.getConnection((err, connection) => {
+      if (err) {
+         console.error("Error getting MySQL connection:", err);
+         res.status(500).json({ message: "Error connecting to database" });
+         return;
       }
-    );
-  });
+
+      // Execute SQL query
+      connection.query(
+         "SELECT * FROM users WHERE id = ?",
+         [userId],
+         (error, results, fields) => {
+            // Release the connection back to the pool
+            connection.release();
+
+            if (error) {
+               console.error("Error executing SQL query:", error);
+               res.status(500).json({ message: "Error executing query" });
+               return;
+            }
+            res.status(200).json(results); // Send query results as JSON response
+         }
+      );
+   });
 });
 
 // Example route to handle saving a marker
 app.post("/saveMarker", async (req, res) => {
-  try {
-    const { title, description, coordinate, time, visible, id_user } = req.body;
+   try {
+      const { title, description, coordinate, time, visible, id_user } =
+         req.body;
 
-    // Get a connection from the pool
-    pool.getConnection((err, connection) => {
-      if (err) {
-        console.error("Error getting MySQL connection:", err);
-        res.status(500).json({
-          message: "Error getting database connection",
-          error: err,
-        });
-        return;
-      }
-
-      // Execute the SQL query using the obtained connection
-      const sql =
-        "INSERT INTO events (title, description, coordinate, time, visible, id_user) VALUES (?, ?, ?, ?, ?, ?)";
-      connection.execute(
-        sql,
-        [title, description, coordinate, time, visible, id_user],
-        (error, results) => {
-          // Release the connection back to the pool
-          connection.release();
-
-          if (error) {
-            console.error("Error executing SQL query:", error);
+      // Get a connection from the pool
+      pool.getConnection((err, connection) => {
+         if (err) {
+            console.error("Error getting MySQL connection:", err);
             res.status(500).json({
-              message: "Error executing SQL query",
-              error: error,
+               message: "Error getting database connection",
+               error: err,
             });
             return;
-          }
+         }
 
-          console.log(
-            "Data inserted successfully:",
-            results.affectedRows,
-            "rows affected"
-          );
-          res.status(200).json({
-            message: "Data inserted successfully",
-            affectedRows: results.affectedRows,
-          });
-        }
-      );
-    });
-  } catch (error) {
-    console.error("Error saving marker:", error);
-    res.status(500).json({
-      message: "An internal server error occurred",
-      error: error,
-    });
-  }
+         // Execute the SQL query using the obtained connection
+         const sql =
+            "INSERT INTO events (title, description, coordinate, time, visible, id_user) VALUES (?, ?, ?, ?, ?, ?)";
+         connection.execute(
+            sql,
+            [title, description, coordinate, time, visible, id_user],
+            (error, results) => {
+               // Release the connection back to the pool
+               connection.release();
+
+               if (error) {
+                  console.error("Error executing SQL query:", error);
+                  res.status(500).json({
+                     message: "Error executing SQL query",
+                     error: error,
+                  });
+                  return;
+               }
+
+               console.log(
+                  "Data inserted successfully:",
+                  results.affectedRows,
+                  "rows affected"
+               );
+               res.status(200).json({
+                  message: "Data inserted successfully",
+                  affectedRows: results.affectedRows,
+               });
+            }
+         );
+      });
+   } catch (error) {
+      console.error("Error saving marker:", error);
+      res.status(500).json({
+         message: "An internal server error occurred",
+         error: error,
+      });
+   }
 });
 
 app.put("/updateMarker/:id", (req, res) => {
-  // Get marker ID from request parameters
-  const markerId = req.params.id;
+   // Get marker ID from request parameters
+   const markerId = req.params.id;
 
-  // Extract updated marker data from request body
-  const { title, description, coordinate, time, visible, id_user } = req.body;
+   // Extract updated marker data from request body
+   const { title, description, coordinate, time, visible, id_user } = req.body;
 
-  // Execute the update query
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.error("Error getting MySQL connection:", err);
-      res.status(500).json({ message: "Error connecting to database" });
-      return;
-    }
-
-    // Execute SQL query to update the marker
-    connection.query(
-      `UPDATE events SET title=?, description=?,  time=?, visible=?, id_user=? WHERE id=?`,
-      [title, description, time, visible, id_user, markerId],
-      (error, results, fields) => {
-        // Release the connection back to the pool
-        connection.release();
-
-        if (error) {
-          console.error("Error executing SQL query:", error);
-          res.status(500).json({ message: "Error updating marker" });
-          return;
-        }
-
-        // Check if any rows were affected by the update
-        if (results.affectedRows === 0) {
-          res.status(404).json({ message: "Marker not found" });
-          return;
-        }
-
-        // Send a success response
-        res.json({ message: "Marker updated successfully" });
+   // Execute the update query
+   pool.getConnection((err, connection) => {
+      if (err) {
+         console.error("Error getting MySQL connection:", err);
+         res.status(500).json({ message: "Error connecting to database" });
+         return;
       }
-    );
-  });
+
+      // Execute SQL query to update the marker
+      connection.query(
+         `UPDATE events SET title=?, description=?,  time=?, visible=?, id_user=? WHERE id=?`,
+         [title, description, time, visible, id_user, markerId],
+         (error, results, fields) => {
+            // Release the connection back to the pool
+            connection.release();
+
+            if (error) {
+               console.error("Error executing SQL query:", error);
+               res.status(500).json({ message: "Error updating marker" });
+               return;
+            }
+
+            // Check if any rows were affected by the update
+            if (results.affectedRows === 0) {
+               res.status(404).json({ message: "Marker not found" });
+               return;
+            }
+
+            // Send a success response
+            res.json({ message: "Marker updated successfully" });
+         }
+      );
+   });
 });
 
 //endpoint for registration of the user
 
 app.post("/register", async (req, res) => {
-  try {
-    const { email, password } = req.body;
+   try {
+      const { email, password } = req.body;
 
-    const salt = await bcrypt.genSalt();
-    const psswordHash = await bcrypt.hash(password, salt);
+      const salt = await bcrypt.genSalt();
+      const psswordHash = await bcrypt.hash(password, salt);
 
-    // Get a connection from the pool
-    pool.getConnection((err, connection) => {
-      if (err) {
-        console.error("Error getting MySQL connection:", err);
-        res.status(500).json({
-          message: "Error getting database connection",
-          error: err,
-        });
-        return;
-      }
+      // Get a connection from the pool
+      pool.getConnection((err, connection) => {
+         if (err) {
+            console.error("Error getting MySQL connection:", err);
+            res.status(500).json({
+               message: "Error getting database connection",
+               error: err,
+            });
+            return;
+         }
 
-      // Execute the SQL query using the obtained connection
-      const sql = "INSERT INTO users (email, password) VALUES (?, ?)";
-      connection.execute(sql, [email, psswordHash], (error, results) => {
-        // Release the connection back to the pool
-        connection.release();
+         // Execute the SQL query using the obtained connection
+         const sql = "INSERT INTO users (email, password) VALUES (?, ?)";
+         connection.execute(sql, [email, psswordHash], (error, results) => {
+            // Release the connection back to the pool
+            connection.release();
 
-        if (error) {
-          console.error("Error executing SQL query:", error);
-          res.status(500).json({
-            message: "Error executing SQL query",
-            error: error,
-          });
-          return;
-        }
+            if (error) {
+               console.error("Error executing SQL query:", error);
+               res.status(500).json({
+                  message: "Error executing SQL query",
+                  error: error,
+               });
+               return;
+            }
 
-        console.log(
-          "Data inserted successfully:",
-          results.affectedRows,
-          "rows affected"
-        );
+            console.log(
+               "Data inserted successfully:",
+               results.affectedRows,
+               "rows affected"
+            );
 
-        //   const token = createToken(results[0].id);
-        //   res.status(200).json({ token });
+            //   const token = createToken(results[0].id);
+            //   res.status(200).json({ token });
 
-        res.status(200).json({
-          message: "Data inserted successfully",
-          affectedRows: results.affectedRows,
-        });
+            res.status(200).json({
+               message: "Data inserted successfully",
+               affectedRows: results.affectedRows,
+            });
+         });
       });
-    });
-  } catch (error) {
-    console.error("Error saving marker:", error);
-    res.status(500).json({
-      message: "An internal server error occurred",
-      error: error,
-    });
-  }
+   } catch (error) {
+      console.error("Error saving marker:", error);
+      res.status(500).json({
+         message: "An internal server error occurred",
+         error: error,
+      });
+   }
 });
 
 //function to create a token for the user
 const createToken = (userId) => {
-  // Set the token payload
-  const payload = {
-    userId: userId,
-  };
+   // Set the token payload
+   const payload = {
+      userId: userId,
+   };
 
-  // Generate the token with a secret key and expiration time
-  const token = jwt.sign(payload, "Q$r2K6W8n!jCW%Zk", { expiresIn: "1h" });
+   // Generate the token with a secret key and expiration time
+   const token = jwt.sign(payload, "Q$r2K6W8n!jCW%Zk", { expiresIn: "1h" });
 
-  return token;
+   return token;
 };
 
 //endpoint for logging in of that particular user
 app.post("/login", (req, res) => {
-  console.log("login");
-  try {
-    const { email, password } = req.body;
+   console.log("login");
+   try {
+      const { email, password } = req.body;
 
-    // Get a connection from the pool
-    pool.getConnection((err, connection) => {
-      if (err) {
-        console.error("Error getting MySQL connection:", err);
-        res.status(500).json({
-          message: "Error getting database connection",
-          error: err,
-        });
-        return;
-      }
-
-      //check if the email and password are provided
-      if (!email || !password) {
-        return res
-          .status(404)
-          .json({ message: "Email and the password are required" });
-      }
-
-      // Execute SQL query
-      connection.query(
-        "SELECT * FROM users WHERE email = ?",
-        [email],
-        async (error, results, fields) => {
-          // Release the connection back to the pool
-          connection.release();
-
-          if (error) {
-            console.error("Error executing SQL query:", error);
-            res.status(500).json({ message: "Error executing query" });
+      // Get a connection from the pool
+      pool.getConnection((err, connection) => {
+         if (err) {
+            console.error("Error getting MySQL connection:", err);
+            res.status(500).json({
+               message: "Error getting database connection",
+               error: err,
+            });
             return;
-          }
-          if (!results.length) {
-            return res.status(404).json({ message: "User not found" });
-          }
+         }
 
-          const isMatch = await bcrypt.compare(password, results[0].password);
+         //check if the email and password are provided
+         if (!email || !password) {
+            return res
+               .status(404)
+               .json({ message: "Email and the password are required" });
+         }
 
-          if (!isMatch)
-            return res.status(400).json({ message: "Invalid Password!" });
+         // Execute SQL query
+         connection.query(
+            "SELECT * FROM users WHERE email = ?",
+            [email],
+            async (error, results, fields) => {
+               // Release the connection back to the pool
+               connection.release();
 
-          const token = createToken(results[0].id);
-          res.status(200).json({ token, userId: results[0].id });
-        }
-      );
-    });
-  } catch (error) {
-    console.error("Error saving marker:", error);
-    res.status(500).json({
-      message: "An internal server error occurred",
-      error: error,
-    });
-  }
+               if (error) {
+                  console.error("Error executing SQL query:", error);
+                  res.status(500).json({ message: "Error executing query" });
+                  return;
+               }
+               if (!results.length) {
+                  return res.status(404).json({ message: "User not found" });
+               }
+
+               const isMatch = await bcrypt.compare(
+                  password,
+                  results[0].password
+               );
+
+               if (!isMatch)
+                  return res.status(400).json({ message: "Invalid Password!" });
+
+               const token = createToken(results[0].id);
+               res.status(200).json({ token, userId: results[0].id });
+            }
+         );
+      });
+   } catch (error) {
+      console.error("Error saving marker:", error);
+      res.status(500).json({
+         message: "An internal server error occurred",
+         error: error,
+      });
+   }
 });

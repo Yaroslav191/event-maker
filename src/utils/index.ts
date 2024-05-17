@@ -57,6 +57,7 @@ export const fetchMarkers = async (
   setMarkers: FetchMarkersInterface["setMarkers"]
 ) => {
   try {
+    console.log(LOCALHOST)
     const response = await axios.get(`http://${LOCALHOST}:8000/markers`);
 
     if (response.status === 200) {
